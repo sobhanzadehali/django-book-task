@@ -16,9 +16,12 @@ class Book(models.Model):
 
 
 class Review(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+    class Meta:
+        unique_together = (('user', 'book'),)
 
     def __str__(self):
         return f"{self.user.email} gave {self.book} {self.rating} out of 5 stars"
