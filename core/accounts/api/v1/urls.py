@@ -6,7 +6,7 @@ from accounts.api.v1.views import CustomDiscardAuthToken, RegisterView, VerifyEm
 app_name = 'api-v1'
 
 urlpatterns = [
-    # registration and vrification
+    # registration and verification
     path('register/', RegisterView.as_view(), name='register'),
     path('email-verify/<str:uidb64>/<str:token>/', VerifyEmailView.as_view(), name='email-verify'),
     # log in/out

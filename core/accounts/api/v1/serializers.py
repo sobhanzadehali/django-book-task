@@ -2,6 +2,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
@@ -23,8 +24,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         token = default_token_generator.make_token(user)
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
 
-        url = reverse('email-verify', kwargs={'uidb64': uidb64, 'token': token})
-        verification_link = f"http://your-frontend.com{url}"
+        url = reverse('accounts:api-v1:email-verify', kwargs={'uidb64': uidb64, 'token': token})
+        verification_link = f"http://{settings.SITE_DOMAIN}{url}"
 
         subject = 'Verify your email'
         message = f"Hi {user.email}, use the link below to verify your email:\n{verification_link}"

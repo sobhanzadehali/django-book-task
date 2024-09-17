@@ -81,7 +81,6 @@ DATABASES = {
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -132,3 +131,5 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ],
 }
+
+SITE_DOMAIN = 'localhost:8000'
