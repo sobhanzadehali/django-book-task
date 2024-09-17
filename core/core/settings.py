@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',  # account app
     'rest_framework.authtoken',
+    'book_lib.apps.BookLibConfig',  # book_lib app
 ]
 
 MIDDLEWARE = [
