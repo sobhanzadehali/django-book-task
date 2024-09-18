@@ -27,4 +27,4 @@ class BookSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ('user', 'rating', 'book',)
+        fields = ('id', 'user', 'rating', 'book',)
