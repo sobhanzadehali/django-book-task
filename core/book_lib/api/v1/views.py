@@ -14,7 +14,11 @@ class BookListAPIView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        books = Book.objects.raw("SELECT * FROM book_lib_book")
+        genre = self.request.query_params.get('genre', None)
+        if genre is not None:
+            books = Book.objects.raw("SELECT * FROM book_lib_book WHERE genre = %s", [genre, ])
+        else:
+            books = Book.objects.raw("SELECT * FROM book_lib_book")
         return books
 
     def get_serializer_context(self):
