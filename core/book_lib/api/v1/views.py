@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsVerified
 from book_lib.api.v1.serializers import BookSerializer, ReviewSerializer
@@ -91,3 +92,55 @@ class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
             cursor.execute(raw_delete_query, [review.id, self.request.user.id])
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SuggestBooksView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_id = request.user.id
+
+        # Get authors of books rated 4 or 5 by the user
+        query1 = """
+            SELECT DISTINCT b.author
+            FROM book_lib_book b
+            JOIN book_lib_review r ON r.book_id = b.id
+            WHERE r.user_id = %s AND r.rating >= 4
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(query1, [user_id])
+            authors = cursor.fetchall()
+
+        # Extract authors from the result
+        author_list = [author[0] for author in authors]
+
+        # If no authors are found, return an empty list early
+        if not author_list:
+            return Response([])
+
+        # Create the placeholders for the authors
+        placeholders = ','.join(['%s'] * len(author_list))
+
+        # Find other books by those authors that the user hasn't already rated
+        query2 = f"""
+            SELECT DISTINCT b.id, b.title, b.author
+            FROM book_lib_book b
+            WHERE b.author IN ({placeholders})
+            AND b.id NOT IN (
+                SELECT r.book_id
+                FROM book_lib_review r
+                WHERE r.user_id = %s
+            )
+        """
+
+        # Execute the second raw SQL query
+        params = author_list + [user_id]
+        with connection.cursor() as cursor:
+            cursor.execute(query2, params)
+            suggested_books = cursor.fetchall()
+
+        # Prepare the response data
+        suggested_books_data = [{'id': book[0], 'title': book[1], 'author': book[2]} for book in suggested_books]
+
+        return Response(suggested_books_data)
