@@ -11,6 +11,11 @@ class Book(models.Model):
     author = models.CharField(max_length=100)
     genre = models.CharField(max_length=100)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['title', 'author']),
+        ]
+
     def __str__(self):
         return self.title
 
